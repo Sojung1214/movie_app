@@ -42,7 +42,7 @@ function App() {
   );
 }
 
-Food.PropTypes = { //props의 자료형, 이름을 검사
+Food.propTypes = { //props의 자료형, 이름을 검사
   name: PropTypes.string.isRequired, //proptype이 string형이 꼭 필요
   picture: PropTypes.string.isRequired, //isrequired가 없으면 이 항목이 없어도 됨
   rating: PropTypes.number.isRequired, 
