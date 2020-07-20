@@ -1,2 +1,7 @@
 # Movie App 2020
-# React JS Fundamentals Course 2020
+클론 코딩 영화 평점 웹 서비스
+책: Do it! 클론코딩 영화 평점 웹 서비스
+#### 리액트로 클론코딩 시 준비해야 할 것은?
+- Node.js, npm, npx, 비주얼 스튜디오 코드, 깃 설치
+
+---
