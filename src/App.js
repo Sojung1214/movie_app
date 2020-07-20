@@ -21,15 +21,16 @@ const foodILike = [
     id: 1, // Food컴포넌트가 서로 다르다는 걸 알 수 없기 때문에 key props를 추가함
     name: 'Kimchi', 
     image: 'http://aeriskitchen.com/wp-content/uploads/2008/09/kimchi_bokkeumbap_02-.jpg',
-    rating: 5,
+    rating: 5.0,
   },
   {
     id: 2, 
     name: "Samgyeopsal",
     image: 'http://aeriskitchen.com/wp-content/uploads/2008/09/kimchi_bokkeumbap_02-.jpg',
-    rating: 4,
+    rating: 4.0,
   }
 ]; 
+
 function App() {
   return (
   <div>
@@ -42,7 +43,7 @@ function App() {
   );
 }
 
-Food.PropTypes = { //props의 자료형, 이름을 검사
+Food.propTypes = { //props의 자료형, 이름을 검사
   name: PropTypes.string.isRequired, //proptype이 string형이 꼭 필요
   picture: PropTypes.string.isRequired, //isrequired가 없으면 이 항목이 없어도 됨
   rating: PropTypes.number.isRequired, 
