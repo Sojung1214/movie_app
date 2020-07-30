@@ -327,6 +327,73 @@ export default App;
 <a id="Ch05"></a>
 ## <b>SECTION 05. state와 클래스형 컴포넌트</b>
  ## (1) state로 숫자 증감 기능 만들기 *(p.112)*
- - 컴포넌트란?
-    * 프로그래밍의 한 부분. 재사용이 가능한 최소 단위
- - 리액트는 컴포넌트와 함께 동작, 리액트 앱은 모두 컴포넌트로 구성됨
+ - state란?
+    * 동적 데이터(변경될 가능성이 있는 데이터)를 다룰 때 사용
+ - state는 클래스형 컴포넌트에서 사용할 수 있는 개념
+
+ - 클래스형 컴포넌트가 되려면 'App 클래스가 리액트가 제공하는 Component 클래스를 반드시 상속받아야 한다는 것'
+ - ~~~js
+   class App extends React.Component {
+
+   }
+   ~~~
+- App 컴포넌트가 JSX를 반환해야 하는데 지금의 App 컴포넌트는 함수가 아닌 클래스라서 return문을 사용할수 없다.
+- 그렇다면 어떻게 해야 할까?
+    * render() 함수를 이용해야 한다!!
+    ~~~js
+    import React from 'react'
+    class App extends React.Component {
+        render(){
+            return <h1>I'm a class component</h1>;
+        }
+    }
+    export default App;
+    ~~~
+- 정리!
+    * 함수형 컴포넌트는 return 문이 JSX를 반환하고 클래스형 컴포너느는 render() 함수가 JSX를 반환한다!!
+
+- state는 객체 형태의 데이터, 사용하려면 반드시 클래스형 컴포넌트 안에서! 소문자를 이용하여! state라고 적는다!
+
+- state에 count 값을 추가하고 사용해보자
+~~~js
+import React from 'react'
+
+class App extends React.Component {
+    state = {
+         count: 0,
+    };
+
+    render(){
+         return <h1>I'm a class component</h1>;
+    }
+}
+
+export default App;
+~~~
+
+## (2) 숫자 증감 기능을 제대로 만들어보기 *(p.121)*
+- 버튼을 추가하여 동작하게 하려면 render() 함수 안에 밑의 코드를 추가한다
+~~~js
+<div>
+    <button onClick={this.add}>Add</button>
+    <button onClick={this.minus}>Minus</button>
+</div>
+~~~
+
+- 리액트는 state가 변경되면 render() 함수를 다시 실행하여 변경된 state를 화면에 출력한다!
+    * 하지만 state를 직접 변경하는 경우에는 render() 함수를 다시 실행하지 않는다
+
+- 그렇다면 setState() 함수로 count state 변경을 해봅시당!
+    * App 클래스에 다음 코드 추가하기
+    ~~~js
+    add = () => {
+        this.setState({count:this.state.count+1});
+        // count state를 1만큼 증가
+    };
+    minus = () => {
+        this.setState({count:his.state.count-1});
+        // count state를 1만큼 감소
+    };
+- 하지만 {count: this.state.count+1}와 같이 코드를 작성하여 state를 업데이트를 한다면 성능 문제가 생길 수 있다
+- 그렇다면 어떻게 힐끼?
+    * setState() 함수의 인자로 함수를 전달하면 성능 문제 없이 state를 업데이트 할 수 있음!
