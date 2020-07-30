@@ -265,3 +265,4 @@ Food.propTypes = { //props의 자료형, 이름을 검사
 
 export default App;
 ~~~
+이제 5장쓸거얌
