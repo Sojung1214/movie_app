@@ -350,7 +350,7 @@ export default App;
     export default App;
     ~~~
 - 정리!
-    * 함수형 컴포넌트는 return 문이 JSX를 반환하고 클래스형 컴포너느는 render() 함수가 JSX를 반환한다!!
+    * 함수형 컴포넌트는 return 문이 JSX를 반환하고 클래스형 컴포넌트는 render() 함수가 JSX를 반환한다!!
 
 - state는 객체 형태의 데이터, 사용하려면 반드시 클래스형 컴포넌트 안에서! 소문자를 이용하여! state라고 적는다!
 
@@ -397,3 +397,130 @@ export default App;
 - 하지만 {count: this.state.count+1}와 같이 코드를 작성하여 state를 업데이트를 한다면 성능 문제가 생길 수 있다
 - 그렇다면 어떻게 힐끼?
     * setState() 함수의 인자로 함수를 전달하면 성능 문제 없이 state를 업데이트 할 수 있음!
+    - 이렇게 코드를 고쳐보자!
+    ~~~js
+    add = () => {
+        this.setState(current => ({
+            count: current.count + 1,
+        }));
+    }
+    minus = () => {
+        this.setState(current => ({
+            count: current.count - 1,
+        }));
+    }
+    ~~~
+    - setState() 함수는 바뀐 state의 데이터만 업데이트 한다!
+
+## (3) 클래스형 컴포넌트의 일생 알아보기 *(p.129)*
+- 클래스형 컴포넌트의 일생을 만들어 주는 생명주기 함수를 알아보자
+- 왜 공부할까?
+    - 생명주기 함수를 이용해서 영화 데이터를 가져와야 한다!
+
+## 3-1 constructor() 함수
+- 다음 코드를 추가하여 render함수와 constructor함수 중 어떤 것이 더 빨리 실행되는지 보자
+~~~js
+constructor(props){
+    super(props);
+    console.log('hello')
+}
+~~~
+~~~js
+render(){ //render() 함수에 다음 코드 추가
+    console.log('render')
+}
+~~~
+- **함수 실행 순서: constructor()함수 > render()함수**
+
+## 3-2 componentDidMount() 함수 
+- 다음 코드를 추가하여 render함수와 constructor함수, componentDidMount함수 중 어떤 것이 더 빨리 실행되는지 보자
+~~~js
+constructor(props){
+    super(props);
+    console.log('hello')
+}
+
+componentDidMount(){
+    console.log('componen rendered');
+}
+~~~
+~~~js
+render(){ //render() 함수에 다음 코드 추가
+    console.log("I'm rendering")
+}
+~~~
+- **함수 실행 순서: constructor()함수 > render()함수 > componentDidMount()함수**
+
+- 다음 생명주기 함수는 리액트에서 업데이트(Update)로 분류한 생명주기 함수이다!
+## 3-3 componentDidUpdate() 함수
+- 다음 코드를 추가해보자
+~~~js
+componentDidMount(){
+    console.log('I just updated');
+}
+~~~
+- 이 함수는 화면이 업데이트되면 실행된다
+    - 예를 들어, <Add> or <Minus> 버튼을 누를 경우 setState()함수가 실행되면 자동으로 render() 함수가 다시 실행되면서 화면이 업데이트 됨!
+
+- **함수 실행 순서: setState()함수 > render()함수 > componentDidUpdate()함수**
+- 다음은 컴포넌트가 죽을 때, 언마운트(Unmount)로 분류한 생명주기 함수이다!
+
+## 3-4 componenetWillUnmount() 함수
+- 다음 코드를 추가해보자
+~~~js
+componentWillUnmount(){
+    console.log('Goodbye, cruel world');
+}
+~~~
+- 이 함수는 아직 실행되지 않는다!
+- 왜냐?
+    - 아직 컴포넌트가 화면에서 떠나게 만드는 코드가 없기 때문!!!
+
+## (4) 영화 앱 만들기 워밍업 *(p.135)*
+- 클래스형 컴포넌트의 생명주기 함수를 적용, Movie 컴포넌트 구성하기!
+
+- 1. App 컴포넌트를 비우고 영화 앱 로딩상태를 구분해 줄 변수 isLoading state를 추가하기
+- 2. '로딩 중이다'와 같은 문장을 화면에 출력할 수 있게 구조 분해 할당과 삼항 연산자를 활용해서 문장 출력할 수 있는 코드 필요 
+- 다음 코드를 추가하자
+~~~js
+import React from 'react';
+
+class App extends React.Component {
+    state = {
+        isLoading: true,
+    };
+    // 구조 분해 할당으로 this.state에 있는 isLoading을 얻으면 항상 this.state입력 안해도 된다!!
+    render() {
+        const { isLoading } = this.state;
+        return <div>{isLoading ? 'Loading...' : 'We are ready'}<div />;
+    }
+}
+
+export default App;
+~~~
+
+- 3. setTimeout()함수를 이용해서 데이터가 로딩되는 현상을 구현
+    - settimeout() 함수는 첫 번째 인자로 전달한 함수를 두 번째 인자로 전달한 값(밀리초)후에 실행
+    - 6초 후에 isLoading state를 false로 바꿈
+    - 다음 코드 실행 시 'Loading...'문장이 6초 후에 'We are ready'라는 문장으로 바뀐다!!
+
+    ~~~js
+    componentDidMount() {
+        settimeout(() => {
+            this.setState({isLoading: false}) // state바꾸기 위해 setState 이용!
+        }, 6000);
+    } // 첫 번째 인자로 setTimeout전달, 두 번째 인자로 6000밀리초 전달
+    ~~~
+    - 그러면 'We are ready' 문장 출력대신 영화 데이터를 출력하면 되겠지?
+
+- 로딩된 영화 데이터를 저장할 수 있도록 movies state를 만들면 되겠다! **(자료형: 배열)**
+- 다음 코드로 수정
+~~~js
+state = {
+    isLoading: true,
+    movies: [],
+};
+~~~
+
+<a id="Ch06"></a>
+## <b>SECTION 06. 영화 앱 만들기</b>
