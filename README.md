@@ -467,7 +467,7 @@ componentDidMount(){
 - **함수 실행 순서: setState()함수 > render()함수 > componentDidUpdate()함수**
 - 다음은 컴포넌트가 죽을 때, 언마운트(Unmount)로 분류한 생명주기 함수이다!
 
-## 3-4 componenetWillUnmount() 함수
+## 3-4 componentWillUnmount() 함수
 - 다음 코드를 추가해보자
 ~~~js
 componentWillUnmount(){
