@@ -526,3 +526,225 @@ state = {
 
 <a id="Ch06"></a>
 ## <b>#SECTION 06. 영화 앱 만들기</b>
+## (1) 영화 API 사용해 보기 *(p.142)*
+- 영화 데이터를 로딩하 위해 axios라는 도구 사용
+~~~js
+> npm install axios  //axios 설치하기
+~~~
+- getMovies() 함수 기다린 다음, axios.get() 함수가 반환한 데이터 잡기
+~~~js
+ getMovies = () => {
+    const movies = axios.get("https://~~");
+} // axios.get()이 반환한 결과를 movies에 저장
+componenetDidMount() {
+    this.getMovies();
+}
+~~~
+- 이렇게 하면 componentDidMount() 함수가 실행되면 this.getMovies()가 실행된다
+   - 이때 자바스크립트에게 'getMovies() 함수는 시간이 필요해'라고 해야만 axios.get()이 반환한 데이터를 제대로 잡을 수 있다!
+   - 그렇게 하기 위해서는 <b>async, await</b>가 필요하다!
+
+- getMovies()에 async를 붙이고, axios.get()에 await를 붙이자
+~~~js
+getMovies = async () => {
+    const movies = await axios.get("http://yts-proxy.now.sh/list_movies.json");
+};
+~~~
+- async: getMovies() 함수는 시간이 필요하다고 말하는 것
+- await: axios.get()의 실행을 기다려 달라고 말하는 것
+
+- 정리!
+  * API에서 데이터를 받아오는 axios.get()을 실행하려면 시간이 필요하고, 그 사실을 자바스크립트에게 알려야만 데이터를 잡을 수 있으므로 async, await를 사용함
+
+## (2) 영화 데이터 화면에 그리기 *(p.153)*
+- console 탭을 보면 data키 안에 data키가 있고 그 안에 movies 배열이 있다
+  - data -> data -> movies 순서대로 객체에 접근하면 원하는 데이터를 추출할 수 있다!
+  - 위의 코드를 아래 코드처럼 바꿔보자
+  ~~~js
+    getMovies = async () => {
+    const {data: {
+        data: {movies},
+    },
+    } = await axios.get("http://yts-proxy.now.sh/list_movies.json");
+     this.setState({movies: movies });
+     }; // 여기서 앞의 movies는 state, 뒤의 movies는 구조 분해 할당으로 얻은 영화 데이터가 있는 변수
+     //movies: movies는 키와 대입할 변수의 이름이 같음 -> movies로 축약 가능!
+  ~~~
+
+- isLoading state true에서 false로 업데이트 하기
+
+~~~js
+this.setState({movies, isLoading: false});
+~~~
+- 코드를 바꿔보면 처음에는 'Loading...' 이 화면에 보이다가 조금 뒤에 'We are ready'로 바뀐다
+
+## (3) Movie 컴포넌트 만들기 *(p.162)*
+- src 폴더에 Movie.js 파일을 만들고 Movie 컴포넌트의 기본 골격을 작성해보자
+~~~js
+import React from 'react';
+import PropTypes from 'prop-types';
+
+function Movie() {
+    return <h1></h1>;
+}
+
+Movie.proptypes = {};
+export default Movie;
+~~~
+- Movie 컴포넌트는 state가 필요하지 않음 -> 클래스형 컴포넌트가 아닌 함수형 컴포넌트로 작성한다
+
+- 다음으로는 Movie.propTypes를 작성해보자
+  - 먼저 id를 Movie.propTypes에 추가하자
+  ~~~js
+  Movie.propTypes = {id: PropTyes.number.isRequired}; //자료형이 number, 반드시 있어야 하므로 isRequired 사용
+  ~~~
+  - 나머지도 추가해보기
+  ~~~js
+  Movie.propTypes = {
+  year: PropTypes.number.isRequired,
+  title: PropTypes.string.isRequired,
+  summary: PropTypes.string.isRequired,
+  poster: PropTypes.string.isRequired,  //이미지 주소: 문자열
+  genres: PropTypes.arrayOf(PropTypes.string).isRequired, 
+  };
+  ~~~
+
+- 평점 순으로 데이터를 정렬하기 위해서는 'sort_by=rating'을 사용한다!
+ - "http://yts-proxy.now.sh/list_movies.json?sort_by=rating" 이렇게 바꿔주기!
+
+- App 컴포넌트에서 Movie 컴포넌트 그리기
+  - 구조 분해 할당으로 this.state에 있는 movies를 얻은 다음, App 컴포너트에서 We are ready를 출력하고 있는 자리에 movies.map()을 사용하자!
+  ~~~js
+  // App.js
+  render() {
+      const { isLoading, movies} = this.state;
+      retun <div>{isLoading ? 'Loading...':movies.map()}</div>;
+  }
+  ~~~
+
+- Movie 컴포넌트 반환하도록 movies.map() 수정하기
+~~~js
+//App.js
+import Movie from './Movie'; // Movie 컴포넌트를 임포트
+...
+render() {
+      const { isLoading, movies} = this.state;
+      retun <div>
+         {isLoading ? 'Loading...'
+            :movies.map((movie) => { // movies는 배열이고, 배열의 원소 1개가 movie로 넘어옴
+                console.log(movie);
+                return <Movie />; //여기서 Movie 컴포넌트를 출력
+            })}
+            </div>;
+  }
+...
+~~~
+
+- Movie 컴포넌트에 props 전달하기
+~~~js
+//App.js
+import Movie from './Movie'; // Movie 컴포넌트를 임포트
+...
+render() {
+      const { isLoading, movies} = this.state;
+      retun <div>
+         {isLoading ? 'Loading...'
+            :movies.map((movie) => { // movies는 배열이고, 배열의 원소 1개가 movie로 넘어옴
+                console.log(movie);
+                return <Movie 
+                  key={movie.id}
+                  id={movie.id}
+                  year={movie.year}
+                  title={movie.title}
+                  summary={movie.summary}
+                  poster={movie.medium_cover_image}
+                  genres={movie.genres}
+                />; //여기서 Movie 컴포넌트를 출력
+            })}
+            </div>;
+  }
+...
+~~~
+
+## (4) 영화 앱 스타일링 하기-기초 *(p.177)*
+- 스타일링의 핵심은 CSS! 하지만 CSS를 적용할 HTML도 필요하니 우선 HTML을 작성해보자
+
+- App 컴포넌트에 HTML 추가하기
+  - App 컴포넌트가 반환할 JSX의 바깥쪽을 <section class="container></section>으로,
+  - 'Loading...'은 <div class="loader"><span class="loader__text"></span></div>로,
+  - movies.map()은 <div class="movies"></div>로 감싸자
+~~~js
+//App.js
+return (<section className="container"> 
+    {isLoading ? (
+      <div className="loader">
+        <span className="loader__text">Loading...</span>
+      </div>)
+     : (
+     <div className="movies"> 
+      {movies.map((movie) => ( //movie 컴포넌트 감싸기
+       <Movie 
+        ...
+       />
+       //Movie 컴포넌트 출력
+     ))}
+    </div>
+     )}
+     </section>
+~~~
+
+- Movie 컴포넌트에 HTML 추가하기
+  - Movie 컴포넌트가 반환할 JSX를 <div class="movie"></div>로 감싸고, 그 안에서 title, year, summary를 목적에 맞는 엘리먼트로 감싸자
+  ~~~js
+  // Movie.js
+  <div className ="movie__data">
+    <h3 className="movie__title">{title}</h3>
+    <h5 className="movie__year">{year}</h5>
+    <p className="movie__summary">{summary.slice(0, 180)}...</p> 
+  </div>
+  ~~~
+
+  - 영화 포스터 이미지 추가하기
+    - poster props를 추가해보자
+    - 전체 엘리먼트를 감싸는 div 엘리먼트를 추가하고 img 엘리먼트를 <div class="movie__data"> 위에 추가해서 img엘리먼트의 src속성에는 poster props를, alt, title 속성에는 title props를 전달
+    ~~~js
+    //Movie.js
+    return (
+        <div className = "movie">
+            <img src={poster} alt = {title} title={title} />
+        
+        <div className ="movie__data">
+            <h3 className="movie__title">{title}</h3>
+            <h5 className="movie__year">{year}</h5>
+            <p className="movie__summary">{summary.slice(0, 180)}...</p> 
+        </div>
+        </div>
+    ~~~
+
+- CSS 파일 생성하기
+  - src 폴더에 Movie.css, App.css파일을 만들자
+  - 그 후, App, Movie 컴포넌트에 App.css, Movie.css를 각각 임포트 하자
+  ~~~js
+  //App.js
+  import './App.css';
+  //Movie.js
+  import './Movie.css';
+  ~~~
+
+<a id="Ch07"></a>
+## <b>#SECTION 07. 영화 앱 다듬기</b>
+- 이 책에서는 CSS원리나 작성하는 방법을 자세히 설명하지 않고 직접 코드를 수정해보면서 익숙해지도록 한다!
+- 스타일링하는 것은 책의 코드를 따라치는 것이므로 CSS에 대해 정리할 것이다!
+
+- CSS: Cascading Style Sheets, 웹페이지를 꾸미기 위해 작성하는 코드
+
+- 지금의 웹은 반응성을 주요시 한다!
+- HTML로 웹페이지를 설계할 때는 보통 Table을 주로 사용하였는데, 이는 각 데이터의 위치가 정해져있기 때문에 구성이 복잡해지고 불편하다
+
+- HTML과 JS, 그리고 CSS의 개별적인 설계는 각각의 유지보수와 효율적인 작업에 도움을 주고, 각 요소가 지원하는 상호작용으로 애니메이션이나 화려한 연출이 가능하다
+- @media 쿼리와 같은 CSS3의 기능으로 모바일 디바이스의 작은화면을 같은 HTML에서 보여줄 수 있게 됩니다.
+
+- 생김새
+ P (//selector) {
+    color (//Property) : red (//Property value)
+}
