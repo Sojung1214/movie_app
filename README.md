@@ -745,6 +745,6 @@ return (<section className="container">
 - @media 쿼리와 같은 CSS3의 기능으로 모바일 디바이스의 작은화면을 같은 HTML에서 보여줄 수 있게 됩니다.
 
 - 생김새
- P (//selector) {
+  - P (//selector) {
     color (//Property) : red (//Property value)
-}
+   }
