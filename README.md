@@ -60,6 +60,8 @@
 
 <a id="Ch01"></a>
 ## <b>#SECTION 01. 안녕 리액트?</b>
+- <b>클론 코딩이란?</b>
+    * 페이스북, 트위터 등 실제로 우리가 사용하는 서비스를 따라 만들면서 배우는 코딩 학습 방식
 - <b>리액트로 클론코딩 시 준비해야 할 것은?</b>
     * Node.js, npm, npx, 비주얼 스튜디오 코드, 깃 설치
 
@@ -742,9 +744,336 @@ return (<section className="container">
 - HTML로 웹페이지를 설계할 때는 보통 Table을 주로 사용하였는데, 이는 각 데이터의 위치가 정해져있기 때문에 구성이 복잡해지고 불편하다
 
 - HTML과 JS, 그리고 CSS의 개별적인 설계는 각각의 유지보수와 효율적인 작업에 도움을 주고, 각 요소가 지원하는 상호작용으로 애니메이션이나 화려한 연출이 가능하다
-- @media 쿼리와 같은 CSS3의 기능으로 모바일 디바이스의 작은화면을 같은 HTML에서 보여줄 수 있게 됩니다.
+- @media 쿼리와 같은 CSS3의 기능으로 모바일 디바이스의 작은화면을 같은 HTML에서 보여줄 수 있다.
 
 - 생김새
   - P (//selector) {
     color (//Property) : red (//Property value)
    }
+
+<a id="Ch08"></a>
+## <b>#SECTION 08. 영화 앱에 여러 기능 추가하기</b>
+## (1) react-router-dom 설치하고 프로젝트 폴더 정리하기 *(p.206)*
+
+- 내비게이션 기능을 추가하면 어떤 효과를 기대할 수 있을까?
+  - 내비게이션 기능으로 Home, About 메뉴를 추가하자!
+  - Home: 영화 앱 화면으로 이동, About: 개발자 자기 소개 화면으로 이동
+  - 이때, 화면 이동을 시켜주는 장치가 필요한데 이를 라우터라 한다!
+
+- 먼저 react-router-dom을 설치하자
+~~~
+> npm istall react-router-dom
+~~~
+
+- 다음은 폴더를 정리하고 필요한 파일을 만들자!
+
+    <img width="300" alt="파일 정리" src="https://user-images.githubusercontent.com/56288954/89725564-d8079780-da4b-11ea-8b00-074de93b288f.JPG">
+
+- 다음은 App.js의 코드를 Home.js로 복사하고 클래스 이름을 App에서 Home으로 변경하자
+ - Movie 컴포넌트와 Home.css도 임포트 하자
+ ~~~js
+ //./src/routes/Home.js
+import Movie from '../components/Movie';
+import './Home.css';
+ ~~~
+ - 그 다음 Home.css 만들기
+ ~~~js
+.container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.loader {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 300;
+}
+
+.movies {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(400px, 1fr));
+    grid-gap: 100px;
+    padding: 50px;
+    width: 80%;
+    padding-top: 70px;
+}
+
+@media screen and (max-width: 1090px) {
+    .movies {
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+}
+ ~~~
+
+## (2) 라우터 만들어 보기 *(p.211)*
+- 라우터는 어떤 일을 할까?
+  - 사용자가 입력한 URL을 통해 특정 컴포넌트를 불러준다.
+  - EX) 사용자가 'localhost:3000/home'이라고 입력 ▷ Home 컴포넌트를 불러준다
+  - react-router-dom은 여러 종류의 라우터를 제공, 이 책에서는 HashRouter와 Route 컴포넌트를 사용한다
+
+- HashRouter와 Route 컴포넌트 사용하기
+  - Hashrouter와 Route 컴포넌트를 임포트하고, HashRouter 컴포넌트가 Route 컴포넌트를 감싸 반환하도록 App.js를 수정하자
+  ~~~js
+  //App.js
+  import { HashRouter, Route } from 'react-router-dom';
+
+  function App(){
+      return(
+          <HashRouter> // 앱이 실행되는 주소에 #/이 붙는다
+            <Route />
+          </HashRoute>
+      );
+  }
+  ~~~
+  - Route에는 2가지 props를 전달할 수 있는데, 하나는 URL을 위한 path props이고, 하나는 URL에 맞는 컴포넌트를 불러 주기 위한 component props이다
+  - 이 두가지를 통해 사용자가 접속한 URL을 보고, 그에 맞는 컴포넌트를 화면에 그릴 수 있는 것!
+
+- 이제 Route 컴포넌트에 path, component props를 추가하자
+~~~js
+//App.js
+import About from './routes/About';
+...
+   <Route path="/about" component={About} />
+...
+~~~
+- 그 다음 About.js 파일을 작성하자
+- 'localhost:3000/#/about'을 입력하면 URL은 'localhost:3000/#/about'이고 About 컴포넌트에 작성한 내용이 나온다
+  - Route 컴포넌트에 전달한 path props를 보고 component props에 지정한 About 컴포넌트를 그려준 것!
+
+- Home 컴포넌트를 위한 Route 컴포넌트도 추가하자
+  - App 컴포넌트에 Home 컴포넌트를 임포트하고, 또 다른 Route 컴포넌트를 추가하기
+  ~~~js
+  //App.js
+  ...
+  import Home from './routes/Home';
+  ...
+  <Route path="/" component={Home} />
+  ...
+  ~~~
+  - 이렇게 하게 되면 About 컴포넌트와 함께 Movie 컴포넌트가 출력될 것이다
+  - 왜 그럴까?? 
+     * 예를 들어, 다음과 같은 상황이라고 하자.
+     ~~~
+     -localhost:3000/#/home → <h1>Home</h1> 출력
+     -localhost:3000/#/home/introduction → <h1>Introduction</h1> 출력
+     -localhost:3000/#/about → <h1>About</h1> 출력
+     ~~~
+     - '/home' 에 접속하면 Home이 출력
+     - '/home/introduction' 에 접속하면 Home Introduction이 출력된다
+        * 왜?
+        * 라우터는 사용자가 <b>/home/introduction</b>에 접속하면 <b>/, /home, /home/introduction</b> 순서로 path props가 있는지 찾는다
+        - 이 때, path props에는 <b>/home과 /home/introduction</b>이 있으므로 Home, Introduction 컴포넌트가 모두 그려지는 것이다!
+
+    - <b>이와 같은 원리로 <b>/about</b> 에 접속하면, /, /about  순서로 path props를 찾으므로 Home, About 컴포넌트가 모두 그려진다!!</b>
+
+- 그렇다면 이 현상을 고쳐보자!
+  - Route 컴포넌트에 exact props를 추가하면 된다
+  - exact props는 Route 컴포넌트가 path props와 정확하게 일치하는 URL에만 반응하도록 만들어준다!
+
+- 다음은 About.css를 작성하고 About.js에 About.css를 임포트 한 후 About.css를 적용할 수 있도록 JSX를 수정하자
+
+## (3) 내비게이션 만들어 보기 *(p.221)*
+- 라우터 준비가 되었으니 내비게이션을 통해 다른 화면으로 이동하면 된다!
+- 라우터를 이용해서 간단한 내비게이션을 만들어 봅시당
+  - <Home>, <About> 라는 2개의 버튼을 만들고 각각의 버튼을 눌렀을 때 적절한 화면을 보여주도록 클론코딩 하자
+
+- 먼저 Navigation 컴포넌트 만들기
+  - componenets 폴더에 Navigation.js 파일을 만들고 2개의 a 엘리먼트를 반환하도록 JSX를 작성하자
+  ~~~js
+  import React from 'react';
+  import {Link} from 'react-router-dom';
+  import './Navigation.css';
+
+  function Navigation() {
+    return (
+        <div className="nav">
+            <Link to="/">Home</Link>
+            <Link to="/about">About</Link>
+        </div>
+    );
+  }
+
+  export default Navigation;
+  ~~~
+
+- 그 다음, App 컴포넌트에 Navigation 컴포넌트를 포함시켜 보자
+  - Navigation.js를 임포트하고 <HashRouter></HashRouter> 사이에 포함시키면 된다
+  ~~~js
+  //App.js
+  ...
+  import Navigation from './components/Navigation';
+  ...
+  <HashRouter>
+    <Navigation />
+  ~~~
+
+- 여기서 Home링크를 눌러보면 잘 동작하기는 하지만 링크를 누를 때마다 리액트가 죽고, 새 페이지가 열리는 문제가 생긴다!
+  - 왜?
+     - a 엘리먼트 특징 떄문!
+     - a 엘리먼트의 href 속성은 페이지 전체를 다시 그린다
+
+  - 그렇다면 어떻게 할까?
+     - 바로 react-router-dom 의 <b>Link 컴포넌트</b>를 사용!!
+     ~~~js
+     import {Link} from 'react-router-dom';
+     ...
+     <Link to="/">Home</Link>
+     <Link to="/about">About</Link>
+     ...
+     ~~~
+
+- 다음은 내비게이션을 스타일링 하자!
+   - componenets 폴더에 Navigation.css 파일 만들고 Navigation 컴포넌트에 임포트 시킨 후, Navigation 컴포넌트의 JSX를 수정하기
+   *- 코드는 책 참고(p.226)*
+
+
+## (4) 영화 상세 정보 기능 만들어 보기 *(p.228)*
+- route props란?
+  - 라우팅 대상이 되는 컴포넌트에 넘겨주는 기본 props
+  - 이것을 이용해야 영화 데이터를 상세 정보 컴포너트에 전달할 수 있음
+
+- route props에 데이터 담아 보내기
+  - Navigation 컴포넌트에 있는 Link 컴포넌트의 to props의 구조를 바꿔보자
+  ~~~js
+  //Navigation.js
+  import 
+  ...
+  <Link to={{pathname:'/about', state: {fromnavigation: true}}}>About</Link>
+  ...
+  ~~~
+  - 이렇게 하면 to props에 객체를 전달했다!
+  - pathname은 URL을 의미, state는 우리가 route props에 보내줄 데이터를 의미
+  - 하지만 이 코드는 사용하지 않을 것! -> 모두 원래대로 돌려 놓자
+
+- Movie 컴포넌트에 Link 컴포넌트 추가하기
+  - Movie 컴포넌트에 Link 컴포넌트를 임포트하고, Link 컴포넌트에 to props를 작성하자
+  ~~~js
+  ...
+  import {Link} from 'react-router-dom';
+  ...
+  <div className="movie">
+    <Link
+       to = {{
+           pathname: '/movie-detail',
+           state: {year, title, summary, poster, genres},
+       }}>
+    ...
+      </div>
+     </Link>
+    </div>
+    ...
+  ~~~
+  - 이제 영화 카드를 누르면 <b>/movie-detail</b>로 이동
+
+- 그렇다면 Detail 컴포넌트를 만들어 보자
+  - Detail 컴포넌트를 routes 폴더에 추가하자
+  - *코드는 p.234 참고*
+  - App.js 에서 Detail 컴포넌트를 임포트하고 Route 컴포넌트에서 Detail 컴포넌트를 그려주도록 코드를 작성하자
+  ~~~js
+  //App.js
+  ... 
+  import Detail from './routes/Detail';
+  ...
+  <Route path="/movie-detail" component={Detail} />
+  ~~~ 
+
+- 여기까지 하면 영화카드를 눌러서 이동하면 Detail 컴포넌트에 잘 넘어간다!
+- 하지만 /movie-detail 을 주소창에 직접 입력해서 이동하면 어떻게 될까?
+  - 출력은 하지만  [Console] 탭에는 영화 데이터가 없다
+  - 바로 Detail 컴포넌트로 영화 데이터가 넘어오지 못한 것!
+  - 이 경우 사용자를 강제로 Home으로 돌려보내야 한다
+  - <b>리다이렉트 기능!!!</b>
+
+## (5) 리다이렉트 기능 만들어 보기 *(p.237)*
+- 리다이렉트 기능을 위해서는 route props의 history 키를 활용해야 한다
+- history 키에는 push, go, goBack, goForward와 같은 키가 있는데,
+그 키에는 URL을 변경해 주는 함수들이 들어 있다.
+
+- 지정한 URL로 보내주는 push() 함수를 사용해 보자.
+- 그전에 Detail 컴포넌트를 클래스형 컴포넌트로 변경하자! ▶ 그래야 component DidMount() 생명주기 함수를 사용해 Detail 컴포넌트가 마운트 될 때 push() 함수를 실행한다
+
+- Detail 컴포넌트 클래스형 컴포넌트로 변경하지
+~~~js
+//Detail.js
+import React from 'react';
+
+class detail extends react.Component {
+    componentDidMount() {
+        consst { location, history } = this.props;
+    }
+
+    render() {
+        return <span>hello</span>;
+    }
+}
+
+export default Detail;
+~~~
+
+- push() 함수 사용하지
+  - location.state가 undefined 인 경우 history.push("/")를 실행하도록 코드를 작성하자
+  ~~~js
+  //Detail.js
+  import React from 'react';
+
+  class detail extends react.Component {
+      componentDidMount() { //Detail 컴포넌트가 마운트되면
+          consst { location, history } = this.props; //구조분해할당으로 location, history를 얻고
+          if (location.state === undefined) { //location.state가 없는 경우
+              history.push('/'); //Home으로 이동시킬 것
+          }
+      }
+
+      render() {
+          return <span>hello</span>;
+      }
+  }
+
+  export default Detail;
+  ~~~
+
+- 이제 영화 상세 정보 페이지를 만들어 보자!!
+
+- 영하 제목 출력하기
+  ~~~js
+  //Detail.js
+  ...
+  render() {
+      const {location} = this.props;
+      return <span>{location.state.title}</span>;
+  }
+  ...
+  ~~~
+
+  - 이제 첫 화면에서 영화 카드를 누르면 영화 제목이 나타난다!
+  - 하지만 또 /movie-detail로 바로 이동하면 오류가 발생,,,
+  - componentDidMount() 생명주기 함수에 작성한 리다이렉트 기능이 동작하지 않는 것 같다,,,
+  - 왜 그럴까?
+     - 바로 Detail 컴포넌트는 <b>render() → componentDidMount() 순서로 함수를 실행하기 때문!</b>
+     - render() 함수 내에서 location.stater.title을 사용하려 하는데, location.state가 아까처럼 undefined이기 때문이다,,
+     - 그래서 render() 함수에도 componentDidMount() 생명주기 함수에 작성한 리다이렉트 코드를 추가하자
+
+    ~~~js
+    //Detail.js
+    ...
+    render() {
+        const {location} = this.props;
+        if (location.state) {
+            return <span>{location.state.title}</span>;
+        }
+        else {
+            return null;
+        }
+    }
+    ...
+    ~~~ 
+
+    - location.state가 없으면 render() 함수가 null을 반환하도록 만들어서 문제 없이 실행되도록 만든 것!
+    - 이어서 componentDidMount() 생명주기 함수가 실행되면서 리다이렉트 기능이 동작한다!!
+
+# 클로노딩 영화 평점 웹서비스 끝★
